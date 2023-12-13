@@ -1,0 +1,45 @@
+CREATE KEYSPACE db0 WITH replication={'class':'SimpleStrategy', 'replication_factor': 3};
+
+USE db0;
+CREATE TABLE user_by_username(
+	user_id uuid  PRIMARY KEY,
+	username text,
+	password text
+);
+
+
+
+CREATE TABLE notes_by_user_id(
+	note_id uuid  PRIMARY KEY,
+	title text,
+	text text,
+	user_id uuid,
+	metadata_id uuid
+);
+
+
+CREATE TABLE presets_by_note_id(
+	preset uuid  PRIMARY KEY,
+	note_id uuid,
+	font_size int,
+	is_italic boolean,
+	is_bold boolean,
+	color text,
+	font text
+);
+
+CREATE TABLE note_metadata(
+	metadata_id uuid PRIMARY KEY,
+	creation_date timestamp,
+	updation_date timestamp
+);
+
+
+CREATE INDEX IF NOT EXISTS ON user_by_username(username);
+
+CREATE INDEX IF NOT EXISTS ON notes_by_user_id(title);
+CREATE INDEX IF NOT EXISTS ON notes_by_user_id(user_id);
+CREATE INDEX IF NOT EXISTS ON notes_by_user_id(metadata_id);
+
+CREATE INDEX IF NOT EXISTS ON presets_by_note_id(note_id);
+
