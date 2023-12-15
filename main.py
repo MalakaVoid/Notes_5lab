@@ -303,7 +303,7 @@ class Metadata(QWidget):
         metadata = get_note_metadata(self.note_id)
 
         self.creation_date_label = QLabel(f'Creation date: {metadata.creation_date.strftime("%Y-%m-%d %H:%M")}')
-        self.updation_date_label = QLabel(f'Update date: {metadata.creation_date.strftime("%Y-%m-%d %H:%M")}')
+        self.updation_date_label = QLabel(f'Update date: {metadata.updation_date.strftime("%Y-%m-%d %H:%M")}')
 
         layout.addWidget(self.creation_date_label)
         layout.addWidget(self.updation_date_label)

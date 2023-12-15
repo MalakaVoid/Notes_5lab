@@ -4,12 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1fd48899-e4ee-4cf4-aa47-0a6b0ea25f17" name="Changes" comment="sett">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cassandra_controller.py" beforeDir="false" afterPath="$PROJECT_DIR$/cassandra_controller.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/functions python.txt" beforeDir="false" afterPath="$PROJECT_DIR$/functions python.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-    </list>
+    <list default="true" id="1fd48899-e4ee-4cf4-aa47-0a6b0ea25f17" name="Changes" comment="ENDPOINT" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -118,7 +113,15 @@
       <option name="project" value="LOCAL" />
       <updated>1702500360870</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="ENDPOINT">
+      <option name="closed" value="true" />
+      <created>1702654208776</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1702654208776</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -134,6 +137,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="sett" />
-    <option name="LAST_COMMIT_MESSAGE" value="sett" />
+    <MESSAGE value="ENDPOINT" />
+    <option name="LAST_COMMIT_MESSAGE" value="ENDPOINT" />
   </component>
 </project>
