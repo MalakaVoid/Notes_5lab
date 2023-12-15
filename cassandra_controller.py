@@ -16,13 +16,17 @@ def login_user(username, password):
     return 404
 
 
-def register_user(username, password):
+def register_user(username, password, email, name, phone):
     result = session.execute(f"SELECT user_id, username, password FROM user_by_username WHERE username = '{username}'")
     user = result.one()
     if user is None:
         try:
-            result = session.execute(f"INSERT INTO user_by_username(user_id, username, password)"
-                                     f"VALUES ({uuid.uuid4()}, '{username}', '{password}')")
+            user_id = uuid.uuid4()
+            session.execute(f"INSERT INTO user_by_username(user_id, username, password)"
+                            f"VALUES ({user_id}, '{username}', '{password}')")
+
+            session.execute(f"INSERT INTO users(user_id, username, password, email, name, phone)"
+                            f"VALUES ({user_id}, '{username}', '{password}', '{email}', '{name}', '{phone}')")
         except Exception as ex:
             print(ex)
             return 404
@@ -50,13 +54,14 @@ def add_note(title, text, user_id):
 
 def edit_note(title, text, user_id):
     try:
-        tmp1 = session.execute(f"SELECT note_id, title FROM notes_by_user_id WHERE user_id = {user_id}")
+        tmp1 = session.execute(f"SELECT note_id, metadata_id, title FROM notes_by_user_id WHERE user_id = {user_id}")
         tmp2 = tmp1.all()
-        note_id = ''
+        note = None
         for each in tmp2:
             if each.title == title:
-                note_id = each.note_id
-        session.execute(f"UPDATE notes_by_user_id SET text = '{text}' WHERE note_id = {note_id}")
+                note = each
+        session.execute(f"UPDATE notes_by_user_id SET text = '{text}' WHERE note_id = {note.note_id}")
+        session.execute(f"UPDATE note_metadata SET updation_date = '{datetime.now()}' WHERE metadata_id = {note.metadata_id}")
     except Exception as ex:
         print(ex)
 
@@ -99,3 +104,16 @@ def edit_note_title(title, note_id):
 
 def delete_note(note_id):
     session.execute(f"DELETE FROM notes_by_user_id WHERE note_id = {note_id}")
+
+def get_user_settings(user_id):
+    result = session.execute(f"SELECT username, password, email, phone, name FROM users WHERE user_id = {user_id}").one()
+    return result
+
+def update_user(user_id, password, email, name, phone):
+    try:
+        session.execute(f"UPDATE users SET password = '{password}', email = '{email}', name = '{name}', phone = '{phone}'"
+                        f" WHERE user_id = {user_id}")
+
+        session.execute(f"UPDATE user_by_username SET password = '{password}' WHERE user_id = {user_id}")
+    except Exception as ex:
+        print(ex)

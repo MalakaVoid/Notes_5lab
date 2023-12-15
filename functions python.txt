@@ -19,7 +19,7 @@ CREATE TABLE notes_by_user_id(
 
 
 CREATE TABLE presets_by_note_id(
-	preset uuid  PRIMARY KEY,
+	preset_id uuid PRIMARY KEY,
 	note_id uuid,
 	font_size int,
 	is_italic boolean,
@@ -34,6 +34,14 @@ CREATE TABLE note_metadata(
 	updation_date timestamp
 );
 
+CREATE TABLE user_by_user_id(
+	user_id uuid  PRIMARY KEY,
+	username text,
+	password text,
+	email text,
+	phone text,
+	name text
+);
 
 CREATE INDEX IF NOT EXISTS ON user_by_username(username);
 

@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLa
 from PyQt5.QtGui import QFont, QColor
 
 from cassandra_controller import *
+from datetime import *
 
 
 class Login(QWidget):
@@ -13,6 +14,8 @@ class Login(QWidget):
 
     def initUI(self):
         layout = QVBoxLayout()
+
+        self.setWindowTitle("Login")
 
         self.username_label = QLabel('Username')
         self.username_input = QLineEdit()
@@ -29,7 +32,7 @@ class Login(QWidget):
         layout.addWidget(self.register_button)
 
         self.login_button.clicked.connect(self.check_credentials)
-        self.register_button.clicked.connect(self.register)
+        self.register_button.clicked.connect(self.registration)
 
         self.setLayout(layout)
 
@@ -46,8 +49,63 @@ class Login(QWidget):
         self.notes_widget.show()
         self.close()
 
+    def registration(self):
+        self.register_window = Registration(self)
+        self.register_window.show()
+        self.close()
+
+class Registration(QWidget):
+    def __init__(self, login_window):
+        super().__init__()
+        self.login_window = login_window
+        self.initUI()
+
+    def initUI(self):
+        layout = QVBoxLayout()
+
+        self.setWindowTitle("Registration")
+
+        self.username_label = QLabel('Username')
+        self.username_input = QLineEdit()
+        self.password_label = QLabel('Password')
+        self.password_input = QLineEdit()
+        self.email_label = QLabel('Email')
+        self.email_input = QLineEdit()
+        self.name_label = QLabel('Name')
+        self.name_input = QLineEdit()
+        self.phone_label = QLabel('Phone')
+        self.phone_input = QLineEdit()
+        self.register_button = QPushButton('Register')
+        self.login_button = QPushButton('Login')
+
+
+        layout.addWidget(self.username_label)
+        layout.addWidget(self.username_input)
+        layout.addWidget(self.password_label)
+        layout.addWidget(self.password_input)
+        layout.addWidget(self.email_label)
+        layout.addWidget(self.email_input)
+        layout.addWidget(self.name_label)
+        layout.addWidget(self.name_input)
+        layout.addWidget(self.phone_label)
+        layout.addWidget(self.phone_input)
+        layout.addWidget(self.register_button)
+        layout.addWidget(self.login_button)
+
+        self.register_button.clicked.connect(self.register)
+        self.login_button.clicked.connect(self.login_page)
+
+        self.setLayout(layout)
+
+    def login_page(self):
+        self.login_window.show()
+        self.close()
+        self.username_input.setText("")
+        self.password_input.setText("")
+
     def register(self):
-        result = register_user(self.username_input.text(), self.password_input.text())
+        result = register_user(self.username_input.text(), self.password_input.text(),
+                               self.email_input.text(), self.name_input.text(), self.phone_input.text())
         if result == 500:
             self.username_label.setText('Username (User already exists)')
             return
@@ -74,7 +132,9 @@ class Notes(QWidget):
         self.delete_button = QPushButton('Delete')
         self.presets_button = QPushButton('Create Preset')
         self.metadata_button = QPushButton('Metadata')
+        self.user_button = QPushButton('User settings')
 
+        layout.addWidget(self.user_button)
         layout.addWidget(self.notes_tab)
         layout.addWidget(self.add_button)
         layout.addWidget(self.save_button)
@@ -87,10 +147,16 @@ class Notes(QWidget):
         self.delete_button.clicked.connect(self.delete_notes)
         self.presets_button.clicked.connect(self.open_presets_page)
         self.metadata_button.clicked.connect(self.open_metadata_page)
+        self.user_button.clicked.connect(self.user_page)
 
         self.setLayout(layout)
         
         self.load_notes()
+
+    def user_page(self):
+        self.user_window = User(self.user_id)
+        self.user_window.show()
+
 
     def load_notes(self):
         notes = get_user_notes(self.user_id)
@@ -127,6 +193,8 @@ class Notes(QWidget):
         self.notes_tab.addTab(note_widget, title)
 
     def open_presets_page(self):
+        if self.notes_tab.count() == 0:
+            return
         self.save_notes()
         self.preset_pages = list()
         self.preset_pages.append(Presets(f"Note {self.notes_tab.currentIndex()}", self.user_id, self))
@@ -134,6 +202,8 @@ class Notes(QWidget):
         self.preset_pages[0].show()
 
     def save_notes(self):
+        if self.notes_tab.count() == 0:
+            return
         note_widget = self.notes_tab.widget(self.notes_tab.currentIndex())
         title = f"Note {self.notes_tab.currentIndex()}"
         text = note_widget.toPlainText()
@@ -144,11 +214,15 @@ class Notes(QWidget):
         self.load_notes()
 
     def open_metadata_page(self):
+        if self.notes_tab.count() == 0:
+            return
         note_id = get_note_id_by_title(self.user_id, f"Note {self.notes_tab.currentIndex()}")
         self.metadata_page = Metadata(note_id)
         self.metadata_page.show()
 
     def delete_notes(self):
+        if self.notes_tab.count() == 0:
+            return
         note_id = get_note_id_by_title(self.user_id, f"Note {self.notes_tab.currentIndex()}")
         delete_note(note_id)
         self.update_window()
@@ -228,13 +302,67 @@ class Metadata(QWidget):
 
         metadata = get_note_metadata(self.note_id)
 
-        self.creation_date_label = QLabel(f'Creation date: {metadata.creation_date}')
-        self.updation_date_label = QLabel(f'Update date: {metadata.creation_date}')
+        self.creation_date_label = QLabel(f'Creation date: {metadata.creation_date.strftime("%Y-%m-%d %H:%M")}')
+        self.updation_date_label = QLabel(f'Update date: {metadata.creation_date.strftime("%Y-%m-%d %H:%M")}')
 
         layout.addWidget(self.creation_date_label)
         layout.addWidget(self.updation_date_label)
 
         self.setLayout(layout)
+
+
+class User(QWidget):
+    def __init__(self, user_id):
+        super().__init__()
+        self.user_id = user_id
+        self.initUI()
+
+    def initUI(self):
+        layout = QVBoxLayout()
+
+        self.setWindowTitle("User Settings")
+
+        self.username_label = QLabel('Username')
+        self.username_input = QLineEdit()
+        self.password_label = QLabel('Password')
+        self.password_input = QLineEdit()
+        self.email_label = QLabel('Email')
+        self.email_input = QLineEdit()
+        self.name_label = QLabel('Name')
+        self.name_input = QLineEdit()
+        self.phone_label = QLabel('Phone')
+        self.phone_input = QLineEdit()
+        self.save_user_button = QPushButton('Save')
+
+        user = get_user_settings(self.user_id)
+
+        layout.addWidget(self.username_label)
+        layout.addWidget(self.username_input)
+        self.username_input.setReadOnly(True)
+        layout.addWidget(self.password_label)
+        layout.addWidget(self.password_input)
+        layout.addWidget(self.email_label)
+        layout.addWidget(self.email_input)
+        layout.addWidget(self.name_label)
+        layout.addWidget(self.name_input)
+        layout.addWidget(self.phone_label)
+        layout.addWidget(self.phone_input)
+        layout.addWidget(self.save_user_button)
+
+        self.username_input.setText(user.username)
+        self.password_input.setText(user.password)
+        self.email_input.setText(user.email)
+        self.name_input.setText(user.name)
+        self.phone_input.setText(user.phone)
+
+        self.save_user_button.clicked.connect(self.save_user)
+
+        self.setLayout(layout)
+
+    def save_user(self):
+        update_user(self.user_id, self.password_input.text(),
+                    self.email_input.text(), self.name_input.text(), self.phone_input.text())
+        self.username_label.setText("Username (SAVED)")
 
 
 if __name__ == '__main__':
